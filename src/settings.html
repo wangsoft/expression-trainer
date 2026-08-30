@@ -8,25 +8,26 @@
   <style>
     body {
       background: #1a1a1a;
-      padding: 40px 32px 32px;
+      padding: 26px 32px 24px;
       display: block;
       overflow-y: auto;
-      -webkit-app-region: drag;
     }
 
     .settings-container {
-      -webkit-app-region: no-drag;
+      display: flex;
+      flex-direction: column;
+      min-height: calc(100vh - 50px);
     }
 
     h1 {
       font-size: 20px;
       font-weight: 600;
-      margin-bottom: 24px;
+      margin-bottom: 18px;
       color: #fff;
     }
 
     .form-group {
-      margin-bottom: 20px;
+      margin-bottom: 15px;
     }
 
     .form-group label {
@@ -53,7 +54,7 @@
 
     .form-group select:focus,
     .form-group input:focus {
-      border-color: #4dabf7;
+      border-color: #E5007E;
     }
 
     .form-group input::placeholder {
@@ -77,25 +78,26 @@
     .btn-save {
       width: 100%;
       padding: 12px;
-      background: #4dabf7;
-      color: #000;
+      background: #E5007E;
+      color: #fff;
       border: none;
       border-radius: 8px;
       font-size: 15px;
       font-weight: 600;
       cursor: pointer;
-      margin-top: 24px;
+      margin-top: 14px;
       transition: background 0.2s;
     }
 
     .btn-save:hover {
-      background: #339af0;
+      background: #ff2a97;
     }
 
     .message-container {
       position: relative;
       height: 20px;
-      margin-top: 12px;
+      margin-top: auto;
+      padding-top: 12px;
     }
 
     .save-success {
@@ -143,7 +145,13 @@
 </head>
 <body>
   <div class="settings-container">
-    <h1>⚙️ 设置</h1>
+    <h1 style="display:flex;align-items:center;gap:9px;">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#E5007E" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="3.2"/>
+        <path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.1 5.1l2.1 2.1M16.8 16.8l2.1 2.1M18.9 5.1l-2.1 2.1M7.2 16.8l-2.1 2.1"/>
+      </svg>
+      设置
+    </h1>
 
     <div class="form-group">
       <label>AI 后端</label>
@@ -186,12 +194,13 @@
     </div>
 
     <div class="message-container">
-      <div class="save-success" id="save-success">✓ 已保存</div>
+      <div class="save-success" id="save-success"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.12em;margin-right:4px;"><path d="M5 12.5l4.2 4.5L19 7"/></svg>已保存</div>
       <div class="connection-error" id="connection-error"></div>
     </div>
     <button class="btn-save" id="btn-save">保存设置</button>
   </div>
 
+  <script src="api-shim.js"></script>
   <script src="settings.js"></script>
 </body>
 </html>

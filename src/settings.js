@@ -175,7 +175,7 @@ class SettingsPage {
       // 连接失败 → 显示红色错误提示，不关闭
       this.btnSave.textContent = '保存设置';
       this.btnSave.classList.remove('loading');
-      errorEl.textContent = `⚠️ 大模型测试连接失败，请核对后重试!`;
+      errorEl.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.1em;margin-right:4px;"><path d="M12 4l9 16H3z"/><line x1="12" y1="10" x2="12" y2="14"/><line x1="12" y1="17" x2="12" y2="17.2"/></svg>大模型测试连接失败，请核对后重试!';
       errorEl.classList.add('show');
     }
   }

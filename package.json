@@ -6,12 +6,22 @@
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "dev": "electron . --dev"
+    "dev": "electron . --dev",
+    "tauri": "tauri",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build"
   },
-  "keywords": ["expression", "training", "speech", "asr", "chinese"],
+  "keywords": [
+    "expression",
+    "training",
+    "speech",
+    "asr",
+    "chinese"
+  ],
   "author": "sisi",
   "license": "MIT",
   "devDependencies": {
+    "@tauri-apps/cli": "^2.11.4",
     "electron": "^33.0.0"
   },
   "dependencies": {

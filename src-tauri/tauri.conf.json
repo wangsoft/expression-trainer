@@ -1,0 +1,47 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "宇宙无敌表达训练",
+  "version": "1.0.0",
+  "identifier": "com.sisi.expression-trainer",
+  "build": {
+    "frontendDist": "../src"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "label": "main",
+        "title": "宇宙无敌表达训练",
+        "width": 1200,
+        "height": 800,
+        "backgroundColor": "#000000",
+        "titleBarStyle": "Overlay",
+        "hiddenTitle": true,
+        "fullscreen": false,
+        "resizable": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["dmg", "app"],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.png"
+    ],
+    "resources": {
+      "../models/sherpa-onnx-streaming-paraformer-bilingual-zh-en/encoder.int8.onnx": "models/sherpa-onnx-streaming-paraformer-bilingual-zh-en/encoder.int8.onnx",
+      "../models/sherpa-onnx-streaming-paraformer-bilingual-zh-en/decoder.int8.onnx": "models/sherpa-onnx-streaming-paraformer-bilingual-zh-en/decoder.int8.onnx",
+      "../models/sherpa-onnx-streaming-paraformer-bilingual-zh-en/tokens.txt": "models/sherpa-onnx-streaming-paraformer-bilingual-zh-en/tokens.txt"
+    },
+    "macOS": {
+      "minimumSystemVersion": "11.0"
+    }
+  }
+}

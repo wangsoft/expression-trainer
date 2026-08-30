@@ -8,10 +8,9 @@
   <style>
     body {
       background: #1a1a1a;
-      padding: 32px;
+      padding: 60px 32px 32px;
       display: block;
       overflow-y: auto;
-      -webkit-app-region: drag;
     }
 
     .editor-container {
@@ -91,13 +90,15 @@
     }
 
     .locked-preview::after {
-      content: '🔒 底层规则不可编辑';
+      content: '底层规则不可编辑';
       position: absolute;
       top: 8px;
       right: 12px;
       font-size: 10px;
       color: #444;
     }
+
+    .example-toggle svg { vertical-align: -0.14em; margin-right: 3px; }
 
     textarea {
       width: 100%;
@@ -233,7 +234,13 @@
 <body>
   <button class="btn-back" id="btn-back">← 返回</button>
   <div class="editor-container">
-    <h1>🎯 训练规则定制</h1>
+    <h1 style="display:flex;align-items:center;gap:9px;">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#E5007E" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.6"/>
+        <circle cx="12" cy="12" r="0.9" fill="#E5007E" stroke="none"/>
+      </svg>
+      训练规则定制
+    </h1>
     <p class="subtitle">底层词库和基础反馈规则始终生效。你可以在上面叠加个人化的训练目标和规则。</p>
 
     <!-- 底层：锁定预览 -->
@@ -259,7 +266,7 @@
       </div>
       <p class="section-desc">你现阶段最想改善的表达问题是什么？AI会据此调整反馈优先级。</p>
       <textarea id="goals" placeholder="比如：&#10;- 我想减少说「然后」的频率&#10;- 我想练习每段话都有一个明确结论&#10;- 我想让表达更有画面感，多用具体细节&#10;- 我想练习用数字代替「很多/很少」"></textarea>
-      <span class="example-toggle" onclick="toggleExample('goals-example')">💡 看示例</span>
+      <span class="example-toggle" onclick="toggleExample('goals-example')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5 L13.4 9.4 L19.5 11 L13.4 12.6 L12 18.5 L10.6 12.6 L4.5 11 L10.6 9.4 Z"/></svg>看示例</span>
       <div id="goals-example" class="example-content">
 我现在最大的问题是：<br>
 1. 说话太散，经常跑题，一段话说完别人不知道我想表达什么<br>
@@ -276,7 +283,7 @@
       </div>
       <p class="section-desc">格式：触发条件 → 输出什么提示（跟底层14条规则一起生效）</p>
       <textarea id="custom-rules" placeholder="比如：&#10;- 连续3句以「我」开头 → 「换个主语」&#10;- 出现「其实吧」「说实话」→ 「直接说」&#10;- 超过30秒没举例子 → 「来个例子」"></textarea>
-      <span class="example-toggle" onclick="toggleExample('rules-example')">💡 看示例</span>
+      <span class="example-toggle" onclick="toggleExample('rules-example')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3.5 L13.4 9.4 L19.5 11 L13.4 12.6 L12 18.5 L10.6 12.6 L4.5 11 L10.6 9.4 Z"/></svg>看示例</span>
       <div id="rules-example" class="example-content">
 - 连续说了两个「非常」→ 「换个程度词」<br>
 - 出现「怎么说呢」→ 「别绕，直说」<br>
@@ -310,9 +317,10 @@
       <button class="btn-save" id="btn-save">保存规则</button>
       <button class="btn-reset" id="btn-reset">恢复默认</button>
     </div>
-    <div class="save-success" id="save-success">✓ 已保存，下次训练生效</div>
+    <div class="save-success" id="save-success"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.12em;margin-right:4px;"><path d="M5 12.5l4.2 4.5L19 7"/></svg>已保存，下次训练生效</div>
   </div>
 
+  <script src="api-shim.js"></script>
   <script>
     function toggleExample(id) {
       const el = document.getElementById(id);
@@ -350,9 +358,10 @@
         document.getElementById('custom-words').value = '';
         await window.api.saveCustomPrompt({ goals: '', customRules: '', styleRef: '', customWords: '' });
         const msg = document.getElementById('save-success');
-        msg.textContent = '✓ 已恢复默认';
+        const check = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.12em;margin-right:4px;"><path d="M5 12.5l4.2 4.5L19 7"/></svg>';
+        msg.innerHTML = check + '已恢复默认';
         msg.classList.add('show');
-        setTimeout(() => { msg.classList.remove('show'); msg.textContent = '✓ 已保存，下次训练生效'; }, 2000);
+        setTimeout(() => { msg.classList.remove('show'); msg.innerHTML = check + '已保存，下次训练生效'; }, 2000);
       }
     });
 

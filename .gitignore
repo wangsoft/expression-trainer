@@ -8,3 +8,12 @@ dist/
 demo-*.html
 prompt-playground.html
 listenhub-*.png
+
+# tooling & build artifacts (added for wangsoft push)
+.claude/
+.agents/
+.adaptive-skills/
+models/*.tar.bz2
+src-tauri/target/
+src-tauri/gen/
+**/.DS_Store

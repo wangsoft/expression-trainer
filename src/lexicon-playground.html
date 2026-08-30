@@ -279,7 +279,7 @@ h1 {
 </head>
 <body>
 
-<h1>🧪 词库 Playground</h1>
+<h1 style="display:flex;align-items:center;gap:9px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#E5007E" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="14" x2="5" y2="18"/><line x1="10" y1="9" x2="10" y2="18"/><line x1="14" y1="6" x2="14" y2="18"/><line x1="19" y1="11" x2="19" y2="18"/></svg>词库 Playground</h1>
 <p class="subtitle">在下面输入或粘贴你的口播稿/录音逐字稿，实时看到哪些词会被高亮，以及会弹出什么替换建议。</p>
 
 <div class="stats-bar" id="stats">
@@ -291,7 +291,7 @@ h1 {
 <div class="main-layout">
   <div class="input-area">
     <textarea id="input" placeholder="在这里输入或粘贴你的口语内容...&#10;&#10;比如：我觉得今天挺开心的，感觉做了很多事情，然后嗯就是特别满足。"></textarea>
-    <div class="hint">💡 绿色 = 笼统词（有替换建议） · 黄色 = 填充词 · 粉色 = 犹豫词。点击绿色词看替换卡片。</div>
+    <div class="hint"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.12em;margin-right:4px;"><path d="M12 3.5 L13.4 9.4 L19.5 11 L13.4 12.6 L12 18.5 L10.6 12.6 L4.5 11 L10.6 9.4 Z"/></svg>绿色 = 笼统词（有替换建议） · 黄色 = 填充词 · 粉色 = 犹豫词。点击绿色词看替换卡片。</div>
     <div class="output-area" id="output">
       <span style="color:#ccc">输入内容后这里会实时显示高亮...</span>
     </div>
@@ -300,14 +300,14 @@ h1 {
   <div class="card-panel">
     <h2>替换卡片</h2>
     <div id="cards">
-      <div class="empty-state">👈 点击左侧绿色词查看替换建议</div>
+      <div class="empty-state"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-0.14em;margin-right:5px;"><line x1="19" y1="12" x2="5" y2="12"/><path d="M11 6l-6 6 6 6"/></svg>点击左侧绿色词查看替换建议</div>
     </div>
   </div>
 </div>
 
 <!-- 词库完整浏览 -->
 <div class="lexicon-browser">
-  <h2>📖 完整词库一览（第一层 97词 + 第二层替换）</h2>
+  <h2 style="display:flex;align-items:center;gap:8px;"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h5v16H6a2 2 0 0 0-2 2z"/><path d="M20 5a2 2 0 0 0-2-2h-5v16h5a2 2 0 0 1 2 2z"/></svg>完整词库一览（第一层 97词 + 第二层替换）</h2>
   <div id="lexicon-list"></div>
 </div>
 

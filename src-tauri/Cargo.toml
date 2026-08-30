@@ -1,0 +1,29 @@
+[package]
+name = "expression-trainer"
+version = "1.0.0"
+description = "宇宙无敌表达训练系统 - 本地桌面版"
+authors = ["sisi"]
+edition = "2021"
+
+# The library is what Tauri (and mobile entry points) link against.
+[lib]
+name = "app_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-dialog = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sherpa-onnx = "1.13.6"
+reqwest = { version = "0.12", features = ["json", "rustls-tls"], default-features = false }
+
+[profile.release]
+# Smaller, faster-to-ship binary for distribution.
+codegen-units = 1
+lto = true
+opt-level = "s"
+strip = true

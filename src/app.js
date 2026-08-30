@@ -13,6 +13,7 @@ class ExpressionTrainer {
     this.stats = { fillers: 0, hedges: 0, vagueWords: 0, totalWords: 0, duration: 0 };
     this.lastFeedbackText = '';
     this.lastReport = '';
+    this.currentHistoryId = null; // links a session's snapshot with its later report
 
     this.initElements();
     this.bindEvents();
@@ -41,6 +42,11 @@ class ExpressionTrainer {
     this.feedbackContent = document.getElementById('feedback-content');
     this.reportModal = document.getElementById('report-modal');
     this.reportBody = document.getElementById('report-body');
+    this.btnHistory = document.getElementById('btn-history');
+    this.historyModal = document.getElementById('history-modal');
+    this.historyBody = document.getElementById('history-body');
+    this.btnCloseHistory = document.getElementById('btn-close-history');
+    this.btnHistoryBack = document.getElementById('btn-history-back');
     this.statFillers = document.getElementById('stat-fillers');
     this.statHedges = document.getElementById('stat-hedges');
     this.statVague = document.getElementById('stat-vague');
@@ -60,8 +66,8 @@ class ExpressionTrainer {
     this.btnCopyReport.addEventListener('click', () => {
       const reportText = this.reportBody.innerText;
       navigator.clipboard.writeText(reportText).then(() => {
-        this.btnCopyReport.textContent = '✅ 已复制';
-        setTimeout(() => { this.btnCopyReport.textContent = '📋 复制全文'; }, 2000);
+        this.btnCopyReport.innerHTML = '<svg class="icon"><use href="#ic-check"/></svg> 已复制';
+        setTimeout(() => { this.btnCopyReport.innerHTML = '<svg class="icon"><use href="#ic-copy"/></svg> 复制全文'; }, 2000);
       });
     });
     this.btnClosePaste.addEventListener('click', () => this.pasteModal.classList.add('hidden'));
@@ -69,6 +75,10 @@ class ExpressionTrainer {
     this.btnCopyText.addEventListener('click', () => this.copyOriginalText());
     this.btnSaveText.addEventListener('click', () => this.saveOriginalText());
     this.btnClear.addEventListener('click', () => this.clearAll());
+    this.btnHistory.addEventListener('click', () => this.openHistory());
+    this.btnCloseHistory.addEventListener('click', () => this.historyModal.classList.add('hidden'));
+    this.btnHistoryBack.addEventListener('click', () => this.renderHistoryList());
+    this.historyBody.addEventListener('click', (e) => this.onHistoryBodyClick(e));
   }
 
   // ===== 录制控制 =====
@@ -105,6 +115,7 @@ class ExpressionTrainer {
     this.pausedTime = 0;
     this.fullText = '';
     this.sentences = [];
+    this.currentHistoryId = null; // new session
     this.resetStats();
     this.subtitleContainer.innerHTML = '';
 
@@ -161,6 +172,7 @@ class ExpressionTrainer {
       this.btnCopyText.classList.remove('hidden');
       this.btnSaveText.classList.remove('hidden');
       this.btnClear.classList.remove('hidden');
+      this.saveSessionSnapshot();
     }
   }
 
@@ -318,27 +330,28 @@ class ExpressionTrainer {
     if (result.success) {
       this.lastReport = result.report;
       this.renderReport(result.report);
+      this.saveSessionSnapshot(result.report);
     } else {
       this.reportBody.innerHTML = `<p style="color:#ff6b6b;">生成失败: ${result.error}</p>`;
     }
   }
 
-  renderReport(report) {
-    let html = report
+  mdToHtml(md) {
+    return (md || '')
       .replace(/^### (.+)$/gm, '<h3>$1</h3>')
       .replace(/^## (.+)$/gm, '<h2>$1</h2>')
       .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
       .replace(/`([^`]+)`/g, '<code>$1</code>')
       .replace(/^> (.+)$/gm, '<blockquote>$1</blockquote>')
-      .replace(/\|(.+)\|/g, (match) => {
-        // 简单表格支持
-        return match;
-      })
       .replace(/\n/g, '<br>');
+  }
+
+  renderReport(report) {
+    const html = this.mdToHtml(report);
 
     this.reportBody.innerHTML = `
       <div style="text-align:right;margin-bottom:12px;">
-        <button id="btn-save-report" style="background:#E5007E;color:#fff;border:none;border-radius:6px;padding:8px 14px;font-size:12px;cursor:pointer;">💾 保存为 Markdown</button>
+        <button id="btn-save-report" style="display:inline-flex;align-items:center;gap:6px;background:#E5007E;color:#fff;border:none;border-radius:6px;padding:8px 14px;font-size:12px;cursor:pointer;"><svg class="icon"><use href="#ic-download"/></svg> 保存为 Markdown</button>
       </div>
       ${html}
     `;
@@ -358,9 +371,9 @@ class ExpressionTrainer {
       const result = await window.api.saveFile(markdown, filename);
       if (result.success) {
         const btn = document.getElementById('btn-save-report');
-        btn.textContent = '✓ 已保存';
+        btn.innerHTML = '<svg class="icon"><use href="#ic-check"/></svg> 已保存';
         btn.style.background = '#333';
-        setTimeout(() => { btn.textContent = '💾 保存为 Markdown'; btn.style.background = '#E5007E'; }, 2000);
+        setTimeout(() => { btn.innerHTML = '<svg class="icon"><use href="#ic-download"/></svg> 保存为 Markdown'; btn.style.background = '#E5007E'; }, 2000);
       }
     } catch (e) {
       alert('保存失败: ' + e.message);
@@ -397,8 +410,8 @@ class ExpressionTrainer {
   copyOriginalText() {
     if (!this.fullText.trim()) return;
     navigator.clipboard.writeText(this.fullText).then(() => {
-      this.btnCopyText.textContent = '✓ 已复制';
-      setTimeout(() => { this.btnCopyText.textContent = '📋 复制'; }, 1500);
+      this.btnCopyText.innerHTML = '<svg class="icon"><use href="#ic-check"/></svg> 已复制';
+      setTimeout(() => { this.btnCopyText.innerHTML = '<svg class="icon"><use href="#ic-copy"/></svg> 复制'; }, 1500);
     });
   }
 
@@ -413,8 +426,8 @@ class ExpressionTrainer {
     try {
       const result = await window.api.saveFile(markdown, filename);
       if (result.success) {
-        this.btnSaveText.textContent = '✓ 已保存';
-        setTimeout(() => { this.btnSaveText.textContent = '💾 保存'; }, 2000);
+        this.btnSaveText.innerHTML = '<svg class="icon"><use href="#ic-check"/></svg> 已保存';
+        setTimeout(() => { this.btnSaveText.innerHTML = '<svg class="icon"><use href="#ic-download"/></svg> 保存'; }, 2000);
       }
     } catch (e) {
       alert('保存失败: ' + e.message);
@@ -425,6 +438,7 @@ class ExpressionTrainer {
     this.fullText = '';
     this.sentences = [];
     this.lastReport = '';
+    this.currentHistoryId = null;
     this.subtitleContainer.innerHTML = '<div class="subtitle-line hint">点击下方按钮开始说话</div>';
     this.feedbackContent.innerHTML = '';
     this.resetStats();
@@ -437,6 +451,119 @@ class ExpressionTrainer {
   }
 
   // ===== 粘贴逐字稿分析 =====
+
+  // ===== 训练历史 =====
+
+  async saveSessionSnapshot(report = '') {
+    if (!this.fullText.trim()) return;
+    if (!this.currentHistoryId) this.currentHistoryId = String(Date.now());
+    const entry = {
+      id: this.currentHistoryId,
+      createdAt: new Date().toISOString(),
+      durationSec: this.stats.duration || 0,
+      totalWords: this.stats.totalWords || 0,
+      fillers: this.stats.fillers || 0,
+      hedges: this.stats.hedges || 0,
+      vagueWords: this.stats.vagueWords || 0,
+      fullText: this.fullText,
+      report: report || this.lastReport || '',
+    };
+    try { await window.api.saveHistory(entry); } catch (e) { /* non-fatal */ }
+  }
+
+  async openHistory() {
+    this.historyModal.classList.remove('hidden');
+    await this.renderHistoryList();
+  }
+
+  async renderHistoryList() {
+    this.btnHistoryBack.classList.add('hidden');
+    let items = [];
+    try { items = await window.api.listHistory(); } catch (e) { items = []; }
+    if (!items || !items.length) {
+      this.historyBody.innerHTML =
+        '<div class="history-empty">还没有训练记录<br><span>完成一次录音或粘贴分析后会自动保存</span></div>';
+      return;
+    }
+    this.historyBody.innerHTML =
+      '<div class="history-list">' + items.map((it) => this.historyCardHtml(it)).join('') + '</div>';
+  }
+
+  historyCardHtml(it) {
+    const meta = [
+      it.durationSec ? this.fmtDuration(it.durationSec) : null,
+      `${it.totalWords || 0} 字`,
+      `填充 ${it.fillers || 0}`,
+      `犹豫 ${it.hedges || 0}`,
+    ].filter(Boolean).join(' · ');
+    const badge = it.hasReport ? '<span class="history-badge">有报告</span>' : '';
+    return `
+      <div class="history-card" data-action="view" data-id="${it.id}">
+        <div class="history-card-main">
+          <div class="history-card-top">
+            <span class="history-date">${this.fmtDate(it.createdAt)}</span>
+            ${badge}
+          </div>
+          <div class="history-meta">${meta}</div>
+          <div class="history-preview">${this.escapeHtml(it.preview || '')}</div>
+        </div>
+        <button class="history-del" data-action="delete" data-id="${it.id}" title="删除" aria-label="删除">
+          <svg class="icon"><use href="#ic-trash"/></svg>
+        </button>
+      </div>`;
+  }
+
+  onHistoryBodyClick(e) {
+    const el = e.target.closest('[data-action]');
+    if (!el) return;
+    const id = el.dataset.id;
+    if (el.dataset.action === 'delete') { e.stopPropagation(); this.deleteHistoryEntry(id); }
+    else if (el.dataset.action === 'view') { this.viewHistoryEntry(id); }
+  }
+
+  async viewHistoryEntry(id) {
+    let entry = null;
+    try { entry = await window.api.getHistory(id); } catch (e) { entry = null; }
+    if (!entry) { this.renderHistoryList(); return; }
+    this.btnHistoryBack.classList.remove('hidden');
+    const reportHtml = entry.report && entry.report.trim()
+      ? `<h2>AI 报告</h2>${this.mdToHtml(entry.report)}`
+      : '<div class="history-empty" style="padding:24px 0;">这条记录没有生成报告</div>';
+    this.historyBody.innerHTML = `
+      <div class="history-detail">
+        <div class="history-detail-head">
+          <span class="history-date">${this.fmtDate(entry.createdAt)}</span>
+          <span class="history-meta">${entry.durationSec ? this.fmtDuration(entry.durationSec) + ' · ' : ''}${entry.totalWords || 0} 字 · 填充 ${entry.fillers || 0} · 犹豫 ${entry.hedges || 0} · 笼统 ${entry.vagueWords || 0}</span>
+        </div>
+        <h2>完整原文</h2>
+        <div class="history-transcript">${this.escapeHtml(entry.fullText || '')}</div>
+        ${reportHtml}
+      </div>`;
+  }
+
+  async deleteHistoryEntry(id) {
+    if (!confirm('删除这条训练记录？')) return;
+    try { await window.api.deleteHistory(id); } catch (e) {}
+    await this.renderHistoryList();
+  }
+
+  fmtDate(iso) {
+    if (!iso) return '';
+    try {
+      const d = new Date(iso);
+      return d.toLocaleString('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+    } catch (e) { return iso; }
+  }
+
+  fmtDuration(sec) {
+    sec = Math.round(sec || 0);
+    const m = Math.floor(sec / 60), s = sec % 60;
+    return m > 0 ? `${m}分${s}秒` : `${s}秒`;
+  }
+
+  escapeHtml(str) {
+    return (str || '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  }
 
   openPasteModal() {
     this.pasteTextarea.value = '';
@@ -454,6 +581,7 @@ class ExpressionTrainer {
     // 把文本显示到字幕区（高亮标记）
     this.subtitleContainer.innerHTML = '';
     this.fullText = text;
+    this.currentHistoryId = null; // new session
     this.resetStats();
 
     // 按句号/问号/感叹号/换行分句
@@ -478,6 +606,7 @@ class ExpressionTrainer {
 
     this.stats.duration = 0; // 粘贴模式没有时长
     this.updateStatsDisplay();
+    this.saveSessionSnapshot();
 
     // 显示操作按钮
     this.btnReport.classList.remove('hidden');
